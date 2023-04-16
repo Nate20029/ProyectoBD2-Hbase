@@ -63,19 +63,25 @@ boton.place(x=x, y=y)
 # Agregar un botón a la ventana principal que abra una nueva ventana al hacer clic
 boton = tk.Button(ventana, text="SCAN", command=ventana_get)
 x = 10
-y = 100
+y = 130
 boton.place(x=x, y=y)
 
 # Agregar un botón a la ventana principal que abra una nueva ventana al hacer clic
 boton = tk.Button(ventana, text="DELETE", command=ventana_get)
 x = 10
-y = 100
+y = 160
 boton.place(x=x, y=y)
 
 # Agregar un botón a la ventana principal que abra una nueva ventana al hacer clic
-boton = tk.Button(ventana, text="SCAN", command=ventana_get)
+boton = tk.Button(ventana, text="COUNT", command=ventana_get)
 x = 10
-y = 100
+y = 190
+boton.place(x=x, y=y)
+
+# Agregar un botón a la ventana principal que abra una nueva ventana al hacer clic
+boton = tk.Button(ventana, text="TRUNCATE", command=ventana_get)
+x = 10
+y = 220
 boton.place(x=x, y=y)
 
 
