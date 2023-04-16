@@ -1,4 +1,3 @@
-
 import tkinter as tk
 # Función para cerrar la ventana
 def salir():
@@ -127,11 +126,13 @@ def ventana_create():
     # Crear una nueva ventana
     ventana2 = tk.Toplevel()
     ventana2.title("Funcion Create")
-
+    """
      # Creamos un botón para mostrar todas las tablas creadas
     mostrar_tablas_button = tk.Button(ventana2, text="Mostrar tablas", command=mostrar_tablas_button_click)
     mostrar_tablas_button.pack()
 
+    """
+    
     # Agregamos un label y un entry para el nombre de la tabla
     table_name_label = tk.Label(ventana2, text="Nombre de la tabla:")
     table_name_label.pack()
@@ -156,12 +157,15 @@ def ventana_create():
 
     ventana2.geometry("500x300")
     # Agregar un botón a la nueva ventana que cierre la ventana actual y muestre la ventana principal de nuevo
-    boton_volver = tk.Button(ventana2, text="Hola", command=lambda:[ventana2.destroy(), ventana.deiconify()])
-    boton_volver.pack()
+    boton_volver = tk.Button(ventana2, text="Regresar a Menú", command=lambda:[ventana2.destroy(), ventana.deiconify()])
+    x = 390
+    y = 265
+    boton_volver.place(x=x, y=y)
 
 
 # Función para crear la nueva ventana
 def ventana_list():
+
     # Ocultar la ventana principal
     ventana.withdraw()
 
@@ -169,10 +173,48 @@ def ventana_list():
     ventana2 = tk.Toplevel()
     ventana2.title("Funcion List")
 
+    def mostrar_tablas():
+        # Limpiar cualquier texto existente en el widget Text
+        texto_salida.delete('1.0', tk.END)
+        
+        # Agregar encabezado a la salida
+        texto_salida.insert(tk.END, "Table\n")
+        
+            # Iterar sobre la lista de tablas y construir la salida
+        for tabla in tablas_creadas:
+            # Obtener el nombre de la tabla
+            tabla_name = tabla['name']
+            # Obtener la cantidad de familias de la tabla
+            tabla_families = len(tabla['families'])
+            # Agregar la fila a la salida
+            texto_salida.insert(tk.END, f"{tabla_name}\t{tabla_families} rows(s)\n")
+        
+        # Agregar el total de filas al final de la salida
+        if len(tablas_creadas) > 1:
+            texto_salida.insert(tk.END, f"{len(tablas_creadas)} rows(s)\n")
+        else:
+            texto_salida.insert(tk.END, f"{len(tablas_creadas)} row(s)\n")
+            
+            # Agregar un separador de línea
+            texto_salida.insert(tk.END, '-'*20)
+        
+
+    # Agregar un widget Text para mostrar la salida
+    texto_salida = tk.Text(ventana2, height=10, width=40)
+    texto_salida.pack()
+
+    # Agregar un botón para mostrar la lista de tablas
+    boton_mostrar = tk.Button(ventana2, text="Mostrar tablas", command=mostrar_tablas)
+    boton_mostrar.pack()
+
     ventana2.geometry("500x300")
     # Agregar un botón a la nueva ventana que cierre la ventana actual y muestre la ventana principal de nuevo
-    boton_volver = tk.Button(ventana2, text="Hola", command=lambda:[ventana2.destroy(), ventana.deiconify()])
-    boton_volver.pack()
+    boton_volver = tk.Button(ventana2, text="Regresar a Menú", command=lambda:[ventana2.destroy(), ventana.deiconify()])
+    x = 390
+    y = 265
+    boton_volver.place(x=x, y=y)
+
+
 
 # Función para crear la nueva ventana
 def ventana_disable_enable():
@@ -185,8 +227,10 @@ def ventana_disable_enable():
 
     ventana2.geometry("500x300")
     # Agregar un botón a la nueva ventana que cierre la ventana actual y muestre la ventana principal de nuevo
-    boton_volver = tk.Button(ventana2, text="Hola", command=lambda:[ventana2.destroy(), ventana.deiconify()])
-    boton_volver.pack()
+    boton_volver = tk.Button(ventana2, text="Regresar a Menú", command=lambda:[ventana2.destroy(), ventana.deiconify()])
+    x = 460
+    y = 265
+    boton_volver.place(x=x, y=y)
 
 
 # Función para crear la nueva ventana
