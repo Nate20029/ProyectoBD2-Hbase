@@ -7,52 +7,12 @@ def salir():
 
 def ventana_put():
 
-        # Definimos una función para crear la tabla
-    def create_table(table_name, column_families):
-        table = {}
-        table['name'] = table_name
-        table['families'] = {}
-        for family in column_families:
-            table['families'][family] = {}
-        return table
-
-    # Definimos una función que se ejecutará cuando el usuario presione el botón "Crear"
-    def create_table_button_click():
-        table_name = table_name_entry.get()
-        column_families = column_families_entry.get().split(',')
-        mi_tabla = create_table(table_name, column_families)
-        result_label.config(text=f"Tabla creada: {mi_tabla}")
-
-    
-    
     # Ocultar la ventana principal
     ventana.withdraw()
 
     # Crear una nueva ventana
     ventana2 = tk.Toplevel()
-    ventana2.title("Funcion Put")
-
-
-    # Agregamos un label y un entry para el nombre de la tabla
-    table_name_label = tk.Label(ventana2, text="Nombre de la tabla:")
-    table_name_label.pack()
-    table_name_entry = tk.Entry(ventana2)
-    table_name_entry.pack()
-
-    # Agregamos un label y un entry para las column families
-    column_families_label = tk.Label(ventana2, text="Column Families (separadas por coma):")
-    column_families_label.pack()
-    column_families_entry = tk.Entry(ventana2)
-    column_families_entry.pack()
-
-    # Agregamos un botón para crear la tabla
-    create_table_button = tk.Button(ventana2, text="Crear tabla", command=create_table_button_click)
-    create_table_button.pack()
-
-    # Agregamos un label para mostrar los resultados
-    result_label = tk.Label(ventana2, text="")
-    result_label.pack()
-
+    ventana2.title("Funcion Create")
 
 
     ventana2.geometry("500x300")
@@ -131,11 +91,151 @@ def ventana_truncate():
     boton_volver = tk.Button(ventana2, text="Hola", command=lambda:[ventana2.destroy(), ventana.deiconify()])
     boton_volver.pack()                
 
+# Creamos una lista vacía para almacenar las tablas creadas
+tablas_creadas = []
+
+# Función para crear la nueva ventana
+def ventana_create():
+
+        # Definimos una función para crear la tabla
+    def create_table(table_name, column_families):
+        table = {}
+        table['name'] = table_name
+        table['families'] = {}
+        for family in column_families:
+            table['families'][family] = {}
+        return table
+
+    # Definimos una función que se ejecutará cuando el usuario presione el botón "Crear"
+    def create_table_button_click():
+        table_name = table_name_entry.get()
+        column_families = column_families_entry.get().split(',')
+        mi_tabla = create_table(table_name, column_families)
+        tablas_creadas.append(mi_tabla)
+
+    # Definimos una función que se ejecutará cuando el usuario presione el botón "Mostrar tablas"
+    def mostrar_tablas_button_click():
+        for tabla in tablas_creadas:
+            print(tabla)
+
+   
     
-  
+    
+    # Ocultar la ventana principal
+    ventana.withdraw()
+
+    # Crear una nueva ventana
+    ventana2 = tk.Toplevel()
+    ventana2.title("Funcion Create")
+
+     # Creamos un botón para mostrar todas las tablas creadas
+    mostrar_tablas_button = tk.Button(ventana2, text="Mostrar tablas", command=mostrar_tablas_button_click)
+    mostrar_tablas_button.pack()
+
+    # Agregamos un label y un entry para el nombre de la tabla
+    table_name_label = tk.Label(ventana2, text="Nombre de la tabla:")
+    table_name_label.pack()
+    table_name_entry = tk.Entry(ventana2)
+    table_name_entry.pack()
+
+    # Agregamos un label y un entry para las column families
+    column_families_label = tk.Label(ventana2, text="Column Families (separadas por coma):")
+    column_families_label.pack()
+    column_families_entry = tk.Entry(ventana2)
+    column_families_entry.pack()
+
+    # Agregamos un botón para crear la tabla
+    create_table_button = tk.Button(ventana2, text="Crear tabla", command=create_table_button_click)
+    create_table_button.pack()
+
+    # Agregamos un label para mostrar los resultados
+    result_label = tk.Label(ventana2, text="")
+    result_label.pack()
+
+
+
+    ventana2.geometry("500x300")
+    # Agregar un botón a la nueva ventana que cierre la ventana actual y muestre la ventana principal de nuevo
+    boton_volver = tk.Button(ventana2, text="Hola", command=lambda:[ventana2.destroy(), ventana.deiconify()])
+    boton_volver.pack()
+
+
+# Función para crear la nueva ventana
+def ventana_list():
+    # Ocultar la ventana principal
+    ventana.withdraw()
+
+    # Crear una nueva ventana
+    ventana2 = tk.Toplevel()
+    ventana2.title("Funcion List")
+
+    ventana2.geometry("500x300")
+    # Agregar un botón a la nueva ventana que cierre la ventana actual y muestre la ventana principal de nuevo
+    boton_volver = tk.Button(ventana2, text="Hola", command=lambda:[ventana2.destroy(), ventana.deiconify()])
+    boton_volver.pack()
+
+# Función para crear la nueva ventana
+def ventana_disable_enable():
+    # Ocultar la ventana principal
+    ventana.withdraw()
+
+    # Crear una nueva ventana
+    ventana2 = tk.Toplevel()
+    ventana2.title("Funcion Disable/Enable")
+
+    ventana2.geometry("500x300")
+    # Agregar un botón a la nueva ventana que cierre la ventana actual y muestre la ventana principal de nuevo
+    boton_volver = tk.Button(ventana2, text="Hola", command=lambda:[ventana2.destroy(), ventana.deiconify()])
+    boton_volver.pack()
+
+
+# Función para crear la nueva ventana
+def ventana_alter():
+    # Ocultar la ventana principal
+    ventana.withdraw()
+
+    # Crear una nueva ventana
+    ventana2 = tk.Toplevel()
+    ventana2.title("Funcion Alter")
+
+    ventana2.geometry("500x300")
+    # Agregar un botón a la nueva ventana que cierre la ventana actual y muestre la ventana principal de nuevo
+    boton_volver = tk.Button(ventana2, text="Hola", command=lambda:[ventana2.destroy(), ventana.deiconify()])
+    boton_volver.pack()
+
+# Función para crear la nueva ventana
+def ventana_drop():
+    # Ocultar la ventana principal
+    ventana.withdraw()
+
+    # Crear una nueva ventana
+    ventana2 = tk.Toplevel()
+    ventana2.title("Funcion drop")
+
+    ventana2.geometry("500x300")
+    # Agregar un botón a la nueva ventana que cierre la ventana actual y muestre la ventana principal de nuevo
+    boton_volver = tk.Button(ventana2, text="Hola", command=lambda:[ventana2.destroy(), ventana.deiconify()])
+    boton_volver.pack()
+
+# Función para crear la nueva ventana
+def ventana_describe():
+    # Ocultar la ventana principal
+    ventana.withdraw()
+
+    # Crear una nueva ventana
+    ventana2 = tk.Toplevel()
+    ventana2.title("Funcion Describe")
+
+    ventana2.geometry("500x300")
+    # Agregar un botón a la nueva ventana que cierre la ventana actual y muestre la ventana principal de nuevo
+    boton_volver = tk.Button(ventana2, text="Hola", command=lambda:[ventana2.destroy(), ventana.deiconify()])
+    boton_volver.pack()
+
 # Crear la ventana principal
 ventana = tk.Tk()
 ventana.title("Simulación de Hbase")
+
+
 
 
 # Etiqueta de bienvenida
@@ -188,37 +288,37 @@ boton.place(x=x, y=y)
 
 
 # Agregar un botón a la ventana principal que abra una nueva ventana al hacer clic
-boton = tk.Button(ventana, text="CREATE", command=ventana_truncate)
+boton = tk.Button(ventana, text="CREATE", command=ventana_create)
 x = 300
 y = 70
 boton.place(x=x, y=y)
 
 # Agregar un botón a la ventana principal que abra una nueva ventana al hacer clic
-boton = tk.Button(ventana, text="LIST", command=ventana_truncate)
+boton = tk.Button(ventana, text="LIST", command=ventana_list)
 x = 300
 y = 100
 boton.place(x=x, y=y)
 
 # Agregar un botón a la ventana principal que abra una nueva ventana al hacer clic
-boton = tk.Button(ventana, text="DISABLE/ENABLE", command=ventana_truncate)
+boton = tk.Button(ventana, text="DISABLE/ENABLE", command=ventana_disable_enable)
 x = 300
 y = 130
 boton.place(x=x, y=y)
 
 # Agregar un botón a la ventana principal que abra una nueva ventana al hacer clic
-boton = tk.Button(ventana, text="ALTER", command=ventana_truncate)
+boton = tk.Button(ventana, text="ALTER", command=ventana_alter)
 x = 300
 y = 160
 boton.place(x=x, y=y)
 
 # Agregar un botón a la ventana principal que abra una nueva ventana al hacer clic
-boton = tk.Button(ventana, text="DROP", command=ventana_truncate)
+boton = tk.Button(ventana, text="DROP", command=ventana_drop)
 x = 300
 y = 190
 boton.place(x=x, y=y)
 
 # Agregar un botón a la ventana principal que abra una nueva ventana al hacer clic
-boton = tk.Button(ventana, text="DESCRIBE", command=ventana_truncate)
+boton = tk.Button(ventana, text="DESCRIBE", command=ventana_describe)
 x = 300
 y = 220
 boton.place(x=x, y=y)
