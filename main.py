@@ -16,6 +16,7 @@ def ventana_put():
         table_name = entry_table.get()
         family_name = entry_family.get()
         row_key = entry_row_key.get()
+        column = entry_column.get()
         value = entry_value.get()
         
         # Buscar la tabla en la lista de habilitadas
@@ -50,20 +51,25 @@ def ventana_put():
     entry_table = tk.Entry(ventana2)
     entry_table.grid(row=0, column=1, padx=5, pady=5)
 
-    label_family = tk.Label(ventana2, text="Familia:")
-    label_family.grid(row=1, column=0, padx=5, pady=5)
-    entry_family = tk.Entry(ventana2)
-    entry_family.grid(row=1, column=1, padx=5, pady=5)
-
     label_row_key = tk.Label(ventana2, text="Row key:")
-    label_row_key.grid(row=2, column=0, padx=5, pady=5)
+    label_row_key.grid(row=1, column=0, padx=5, pady=5)
     entry_row_key = tk.Entry(ventana2)
-    entry_row_key.grid(row=2, column=1, padx=5, pady=5)
+    entry_row_key.grid(row=1, column=1, padx=5, pady=5)
+
+    label_family = tk.Label(ventana2, text="Familia:")
+    label_family.grid(row=2, column=0, padx=5, pady=5)
+    entry_family = tk.Entry(ventana2)
+    entry_family.grid(row=2, column=1, padx=5, pady=5)
+
+    label_family = tk.Label(ventana2, text="Columna:")
+    label_family.grid(row=3, column=0, padx=5, pady=5)
+    entry_family = tk.Entry(ventana2)
+    entry_family.grid(row=3, column=1, padx=5, pady=5)
 
     label_value = tk.Label(ventana2, text="Valor:")
-    label_value.grid(row=3, column=0, padx=5, pady=5)
+    label_value.grid(row=4, column=0, padx=5, pady=5)
     entry_value = tk.Entry(ventana2)
-    entry_value.grid(row=3, column=1, padx=5, pady=5)
+    entry_value.grid(row=4, column=1, padx=5, pady=5)
 
     button_put = tk.Button(ventana2, text="PUT", command=put_record)
     button_put.grid(row=4, column=1, padx=5, pady=5)
@@ -87,6 +93,54 @@ def ventana_get():
     # Crear una nueva ventana
     ventana2 = tk.Toplevel()
     ventana2.title("Funcion Get")
+
+    def get_record(table_name, row_key):
+    # buscar la tabla en la lista de habilitadas
+        for table in tables_enabled:
+            if table['name'] == table_name:
+                # buscar la fila en las familias y retornar el valor
+                for family_options in table['families'].values():
+                    if family_options['row_key'] == row_key:
+                        return family_options['value']
+
+        # si la tabla no se encuentra en la lista de habilitadas, retornar mensaje de error
+        return f"Table {table_name} not found"
+
+
+    def get_data():
+        # obtener los valores de los campos de entrada
+        table_name = table_name_entry.get()
+        row_key = row_key_entry.get()
+
+        # llamar a la función get_record y obtener el valor retornado
+        value = get_record(table_name, int(row_key))
+
+        # actualizar el texto en el campo de salida
+        output_text.set(value)
+
+
+    table_name_label = tk.Label(ventana2, text="Nombre de la Tabla:")
+    table_name_entry = tk.Entry(ventana2)
+
+    row_key_label = tk.Label(ventana2, text="Row Key:")
+    row_key_entry = tk.Entry(ventana2)
+
+    get_button = tk.Button(ventana2, text="Get", command=get_data)
+
+    output_text = tk.StringVar()
+    output_label = tk.Label(ventana2, textvariable=output_text)
+
+    # posicionar los widgets en la ventana
+    table_name_label.grid(row=0, column=0)
+    table_name_entry.grid(row=0, column=1)
+
+    row_key_label.grid(row=1, column=0)
+    row_key_entry.grid(row=1, column=1)
+
+    get_button.grid(row=2, column=0)
+
+    output_label.grid(row=3, column=0, columnspan=2)
+
 
     ventana2.geometry("500x300")
     # Agregar un botón a la nueva ventana que cierre la ventana actual y muestre la ventana principal de nuevo
@@ -169,14 +223,10 @@ def ventana_create():
         table = {}
         last_row_key = 0
         table['name'] = table_name
-        table['families'] = {}
+        table['default'] = {'families': {}}
         for family_name in column_families:
             family = {}
-            family['row_key'] = last_row_key + 1
-            family['Timestamp'] = random.randint(10**9, 10**10-1)
-            family['value'] = f'val_{last_row_key+1}'
-            last_row_key += 1
-            table['families'][family_name] = family
+            table['default']['families'][family_name] = family
         return table
 
     # Definimos una función que se ejecutará cuando el usuario presione el botón "Crear"
@@ -250,27 +300,31 @@ def ventana_list():
     def mostrar_tablas():
         # Limpiar cualquier texto existente en el widget Text
         texto_salida.delete('1.0', tk.END)
-        
+
         # Agregar encabezado a la salida
         texto_salida.insert(tk.END, "Table\n")
-        
-            # Iterar sobre la lista de tablas y construir la salida
+
+        # Iterar sobre la lista de tablas y construir la salida
         for tabla in tables_enabled:
             # Obtener el nombre de la tabla
             tabla_name = tabla['name']
             # Obtener la cantidad de familias de la tabla
-            tabla_families = len(tabla['families'])
+            if 'families' in tabla['default']:
+                tabla_families = len(tabla['default']['families'])
+            else:
+                tabla_families = 0
             # Agregar la fila a la salida
             texto_salida.insert(tk.END, f"{tabla_name}\t{tabla_families} rows(s)\n")
-        
+
         # Agregar el total de filas al final de la salida
         if len(tables_enabled) > 1:
             texto_salida.insert(tk.END, f"{len(tables_enabled)} rows(s)\n")
         else:
             texto_salida.insert(tk.END, f"{len(tables_enabled)} row(s)\n")
-            
-            # Agregar un separador de línea
-            texto_salida.insert(tk.END, '-'*20)
+
+        # Agregar un separador de línea
+        texto_salida.insert(tk.END, '-'*20)
+
         
 
     # Agregar un widget Text para mostrar la salida
@@ -455,20 +509,21 @@ def ventana_alter():
 
         # Buscar la tabla en la lista de tablas habilitadas
         table_found = False
-        table_found = False
         for table in tables_enabled:
             if table['name'] == table_name:
                 table_found = True
                 # Modificar la definición de la tabla
-                if old_family_name in table['families']:
-                    new_families = {}
-                    for key in table['families']:
-                        if key == old_family_name:
-                            new_families[new_family_name] = table['families'][old_family_name]
-                        else:
-                            new_families[key] = table['families'][key]
-                    table['families'] = new_families
-                    break
+                if 'default' in table:
+                    default_data = table['default']
+                    if 'families' in default_data and old_family_name in default_data['families']:
+                        new_families = {}
+                        for key, value in default_data['families'].items():
+                            if key == old_family_name:
+                                new_families[new_family_name] = value
+                            else:
+                                new_families[key] = value
+                        default_data['families'] = new_families
+                        break
 
         if table_found:
             # Actualizar la etiqueta de estado
@@ -578,7 +633,7 @@ def ventana_describe():
     ventana2 = tk.Toplevel()
     ventana2.title("Funcion Describe")
 
-        # función para simular el comando describe
+    # función para simular el comando describe
     def describe_table(table_name):
         table_data = None
         table_type = None
@@ -605,17 +660,16 @@ def ventana_describe():
         # generar la salida para la tabla encontrada
         table_text = f"Table  {table_name} is {table_type}\n"
         table_text += f"{table_name}\n"
-        for family_name, family_options in table_data['families'].items():
-            table_text += f"\nNAME => {family_name}, "
+        for family_name, family_options in table_data['default']['families'].items():
+            table_text += f"\nNAME => {family_name} \n"
             for option_name, option_value in family_options.items():
-                table_text += f"{option_name} => {option_value}, "
+                table_text += f"     {option_name} => {option_value} \n"
         return table_text
 
     def show_table_info():
         table_name = table_name_entry.get()
         table_info = describe_table(table_name)
         result_label.config(text=table_info)
-
 
     # agregar un campo de texto para ingresar el nombre de la tabla
     table_name_label = tk.Label(ventana2, text="Table Name")
