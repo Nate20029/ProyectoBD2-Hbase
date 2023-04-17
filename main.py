@@ -5,16 +5,71 @@ import random
 def salir():
     ventana.destroy()
 
-
 def ventana_put():
-
-    # Ocultar la ventana principal
-    ventana.withdraw()
-
     # Crear una nueva ventana
     ventana2 = tk.Toplevel()
-    ventana2.title("Funcion Create")
+    ventana2.title("Funcion Put")
 
+    # Función para simular el comando PUT
+    def put_record():
+        # Obtener los datos de la interfaz gráfica
+        table_name = entry_table.get()
+        family_name = entry_family.get()
+        row_key = entry_row_key.get()
+        value = entry_value.get()
+        
+        # Buscar la tabla en la lista de habilitadas
+        table_found = False
+        for table in tables_enabled:
+            if table['name'] == table_name:
+                table_found = True
+                # Buscar la familia en la tabla
+                if family_name in table['families']:
+                    # Agregar la nueva fila a la familia
+                    new_row = {
+                        'row_key': row_key,
+                        'Timestamp': 'timestamp_actual',
+                        'value': value
+                    }
+                    table['families'][family_name][row_key] = new_row
+                    # Mostrar mensaje de éxito
+                    label_result.config(text="Registro agregado exitosamente.")
+                else:
+                    # Mostrar mensaje de error si la familia no existe
+                    label_result.config(text="La familia especificada no existe.")
+                break
+        
+        # Mostrar mensaje de error si la tabla no existe
+        if not table_found:
+            label_result.config(text="La tabla especificada no existe.")
+
+
+    # Crear los elementos de la interfaz gráfica
+    label_table = tk.Label(ventana2, text="Tabla:")
+    label_table.grid(row=0, column=0, padx=5, pady=5)
+    entry_table = tk.Entry(ventana2)
+    entry_table.grid(row=0, column=1, padx=5, pady=5)
+
+    label_family = tk.Label(ventana2, text="Familia:")
+    label_family.grid(row=1, column=0, padx=5, pady=5)
+    entry_family = tk.Entry(ventana2)
+    entry_family.grid(row=1, column=1, padx=5, pady=5)
+
+    label_row_key = tk.Label(ventana2, text="Row key:")
+    label_row_key.grid(row=2, column=0, padx=5, pady=5)
+    entry_row_key = tk.Entry(ventana2)
+    entry_row_key.grid(row=2, column=1, padx=5, pady=5)
+
+    label_value = tk.Label(ventana2, text="Valor:")
+    label_value.grid(row=3, column=0, padx=5, pady=5)
+    entry_value = tk.Entry(ventana2)
+    entry_value.grid(row=3, column=1, padx=5, pady=5)
+
+    button_put = tk.Button(ventana2, text="PUT", command=put_record)
+    button_put.grid(row=4, column=1, padx=5, pady=5)
+
+    label_result = tk.Label(ventana2, text="")
+    label_result.grid(row=5, column=1, padx=5, pady=5)
 
     ventana2.geometry("500x300")
     # Agregar un botón a la nueva ventana que cierre la ventana actual y muestre la ventana principal de nuevo
