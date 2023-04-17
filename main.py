@@ -90,8 +90,6 @@ def ventana_truncate():
     boton_volver = tk.Button(ventana2, text="Hola", command=lambda:[ventana2.destroy(), ventana.deiconify()])
     boton_volver.pack()                
 
-# Creamos una lista vacía para almacenar las tablas creadas
-tablas_creadas = []
 
 # Función para crear la nueva ventana
 def ventana_create():
@@ -110,11 +108,11 @@ def ventana_create():
         table_name = table_name_entry.get()
         column_families = column_families_entry.get().split(',')
         mi_tabla = create_table(table_name, column_families)
-        tablas_creadas.append(mi_tabla)
+        tables_enabled.append(mi_tabla)
 
     # Definimos una función que se ejecutará cuando el usuario presione el botón "Mostrar tablas"
     def mostrar_tablas_button_click():
-        for tabla in tablas_creadas:
+        for tabla in tables_enabled:
             print(tabla)
 
    
@@ -126,12 +124,12 @@ def ventana_create():
     # Crear una nueva ventana
     ventana2 = tk.Toplevel()
     ventana2.title("Funcion Create")
-    """
+    
      # Creamos un botón para mostrar todas las tablas creadas
     mostrar_tablas_button = tk.Button(ventana2, text="Mostrar tablas", command=mostrar_tablas_button_click)
     mostrar_tablas_button.pack()
 
-    """
+    
     
     # Agregamos un label y un entry para el nombre de la tabla
     table_name_label = tk.Label(ventana2, text="Nombre de la tabla:")
@@ -181,7 +179,7 @@ def ventana_list():
         texto_salida.insert(tk.END, "Table\n")
         
             # Iterar sobre la lista de tablas y construir la salida
-        for tabla in tablas_creadas:
+        for tabla in tables_enabled:
             # Obtener el nombre de la tabla
             tabla_name = tabla['name']
             # Obtener la cantidad de familias de la tabla
@@ -190,10 +188,10 @@ def ventana_list():
             texto_salida.insert(tk.END, f"{tabla_name}\t{tabla_families} rows(s)\n")
         
         # Agregar el total de filas al final de la salida
-        if len(tablas_creadas) > 1:
-            texto_salida.insert(tk.END, f"{len(tablas_creadas)} rows(s)\n")
+        if len(tables_enabled) > 1:
+            texto_salida.insert(tk.END, f"{len(tables_enabled)} rows(s)\n")
         else:
-            texto_salida.insert(tk.END, f"{len(tablas_creadas)} row(s)\n")
+            texto_salida.insert(tk.END, f"{len(tables_enabled)} row(s)\n")
             
             # Agregar un separador de línea
             texto_salida.insert(tk.END, '-'*20)
@@ -215,6 +213,8 @@ def ventana_list():
     boton_volver.place(x=x, y=y)
 
 
+tables_enabled = []
+tables_disabled = []
 
 # Función para crear la nueva ventana
 def ventana_disable_enable():
@@ -224,6 +224,78 @@ def ventana_disable_enable():
     # Crear una nueva ventana
     ventana2 = tk.Toplevel()
     ventana2.title("Funcion Disable/Enable")
+
+        # Crear una etiqueta y un campo de entrada para el nombre de la tabla
+    label_table1 = tk.Label(ventana2, text="Nombre de la tabla:")
+    x = 200
+    y = 75
+    label_table1.place(x=x, y=y)
+    entry_table1 = tk.Entry(ventana2)
+    x = 200
+    y = 95
+    entry_table1.place(x=x, y=y)
+
+    def enable_table():
+        table_name = entry_table1.get()
+        table_found = False
+        for table in tables_disabled:
+            if table['name'] == table_name:
+                # Mover la tabla de la lista de tablas deshabilitadas a la lista de tablas habilitadas
+                tables_disabled.remove(table)
+                tables_enabled.append(table)
+                message = f"La tabla '{table_name}' ha sido habilitada."
+                label_message.config(text=message)
+                table_found = True
+                break
+        if not table_found:
+            message = f"La tabla '{table_name}' no se encontró o ya está habilitada."
+            label_message.config(text=message)
+
+
+    def disable_table():
+        table_name = entry_table.get()
+        table_found = False
+        for table in tables_enabled:
+            if table['name'] == table_name:
+                # Mover la tabla de la lista de tablas habilitadas a la lista de tablas deshabilitadas
+                tables_enabled.remove(table)
+                tables_disabled.append(table)
+                message = f"La tabla '{table_name}' ha sido deshabilitada."
+                label_message.config(text=message)
+                table_found = True
+                break
+        if not table_found:
+            message = f"La tabla '{table_name}' no se encontró o ya está deshabilitada."
+            label_message.config(text=message)
+
+        # Crear una etiqueta y un campo de entrada para el nombre de la tabla
+    label_table = tk.Label(ventana2, text="Nombre de la tabla:")
+    x = 10
+    y = 75
+    label_table.place(x=x, y=y)
+    entry_table = tk.Entry(ventana2)
+    x = 10
+    y = 100
+    entry_table.place(x=x, y=y)
+
+    # Crear un botón para deshabilitar la tabla
+    button_disable = tk.Button(ventana2, text="Deshabilitar tabla", command=disable_table)
+    x = 10
+    y = 130
+    button_disable.place(x=x, y=y)
+
+
+    # Crear un botón para habilitar la tabla
+    button_enable1 = tk.Button(ventana2, text="Habilitar tabla", command=enable_table)
+    x = 200
+    y = 130
+    button_enable1.place(x=x, y=y)
+
+
+    # Crear un Label para mostrar el mensaje
+    label_message = tk.Label(ventana2, text="")
+    label_message.pack()
+
 
     ventana2.geometry("500x300")
     # Agregar un botón a la nueva ventana que cierre la ventana actual y muestre la ventana principal de nuevo
@@ -241,6 +313,132 @@ def ventana_alter():
     # Crear una nueva ventana
     ventana2 = tk.Toplevel()
     ventana2.title("Funcion Alter")
+
+
+    # Define una función para modificar la definición de la tabla
+    def alter_table_name():
+        # Obtener los valores actuales de los atributos que se van a modificar
+        table_name = name_entry1.get()
+
+        # Buscar la tabla en la lista de tablas habilitadas
+        table_found = False
+        for table in tables_enabled:
+            if table['name'] == table_name:
+                table_found = True
+                # Modificar la definición de la tabla
+                table['name'] = new_name_entry1.get()
+
+        if table_found:
+            # Actualizar la etiqueta de estado
+            status_label.config(text='La tabla ha sido modificada')
+        else:
+            # Actualizar la etiqueta de estado
+            status_label.config(text='La tabla no ha sido encontrada')
+
+
+    # Crear las entradas de texto para los atributos
+    name_label1 = tk.Label(ventana2, text='Nombre de la tabla')
+    name_entry1 = tk.Entry(ventana2)
+    new_name_label1 = tk.Label(ventana2, text='Nuevo nombre de la tabla')
+    new_name_entry1 = tk.Entry(ventana2)
+
+    # Crear el botón para modificar la tabla
+    alter_button = tk.Button(ventana2, text='Modificar tabla', command=alter_table_name)
+
+    # Crear la etiqueta de estado
+    status_label = tk.Label(ventana2, text='')
+
+    # Mostrar los elementos en la ventana
+    x = 300
+    y = 35
+    name_label1.place(x=x, y=y)
+    x = 300
+    y = 55
+    name_entry1.place(x=x, y=y)
+    x = 300
+    y = 75
+    new_name_label1.place(x=x, y=y)
+    x = 300
+    y = 95
+    new_name_entry1.place(x=x, y=y)
+    x = 300
+    y = 115
+    alter_button.place(x=x, y=y)
+    x = 300
+    y = 125
+    status_label.place(x=x, y=y)
+
+
+
+        # Define una función para modificar la definición de la tabla
+    def alter_table_colum():
+        # Obtener los valores actuales de los atributos que se van a modificar
+        table_name = name_entry.get()
+        old_family_name = old_family_entry.get()
+        new_family_name = new_family_entry.get()
+
+        # Buscar la tabla en la lista de tablas habilitadas
+        table_found = False
+        table_found = False
+        for table in tables_enabled:
+            if table['name'] == table_name:
+                table_found = True
+                # Modificar la definición de la tabla
+                if old_family_name in table['families']:
+                    new_families = {}
+                    for key in table['families']:
+                        if key == old_family_name:
+                            new_families[new_family_name] = table['families'][old_family_name]
+                        else:
+                            new_families[key] = table['families'][key]
+                    table['families'] = new_families
+                    break
+
+        if table_found:
+            # Actualizar la etiqueta de estado
+            status_label.config(text='La tabla ha sido modificada')
+        else:
+            # Actualizar la etiqueta de estado
+            status_label.config(text='La tabla no ha sido encontrada')
+
+
+    # Crear las entradas de texto para los atributos
+    name_label = tk.Label(ventana2, text='Nombre de la tabla')
+    name_entry = tk.Entry(ventana2)
+    old_family_label = tk.Label(ventana2, text='Nombre de la familia de columnas a modificar')
+    old_family_entry = tk.Entry(ventana2)
+    new_family_label = tk.Label(ventana2, text='Nuevo nombre de la familia de columnas')
+    new_family_entry = tk.Entry(ventana2)
+
+    # Crear el botón para modificar la tabla
+    alter_button = tk.Button(ventana2, text='Modificar tabla', command=alter_table_colum)
+
+    # Crear la etiqueta de estado
+    status_label = tk.Label(ventana2, text='')
+
+    # Mostrar los elementos en la ventana
+    x = 10
+    y = 35
+    name_label.place(x=x, y=y)
+    x = 10
+    y = 55
+    name_entry.place(x=x, y=y)
+    x = 10
+    y = 75
+    old_family_label.place(x=x, y=y)
+    x = 10
+    y = 95
+    old_family_entry.place(x=x, y=y)
+    x = 10
+    y = 125
+    new_family_label.place(x=x, y=y)
+    x = 10
+    y = 145
+    new_family_entry.place(x=x, y=y)
+    x = 10
+    y = 165
+    alter_button.place(x=x, y=y)
+
 
     ventana2.geometry("500x300")
     # Agregar un botón a la nueva ventana que cierre la ventana actual y muestre la ventana principal de nuevo
