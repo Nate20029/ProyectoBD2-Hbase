@@ -14,32 +14,72 @@ def ventana_put():
     def put_record():
         # Obtener los datos de la interfaz gráfica
         table_name = entry_table.get()
-        family_name = entry_family.get()
         row_key = entry_row_key.get()
+        family_name = entry_family.get()
         column = entry_column.get()
         value = entry_value.get()
-        
+
         # Buscar la tabla en la lista de habilitadas
         table_found = False
         for table in tables_enabled:
             if table['name'] == table_name:
                 table_found = True
-                # Buscar la familia en la tabla
-                if family_name in table['families']:
-                    # Agregar la nueva fila a la familia
-                    new_row = {
-                        'row_key': row_key,
-                        'Timestamp': 'timestamp_actual',
-                        'value': value
-                    }
-                    table['families'][family_name][row_key] = new_row
-                    # Mostrar mensaje de éxito
-                    label_result.config(text="Registro agregado exitosamente.")
-                else:
-                    # Mostrar mensaje de error si la familia no existe
-                    label_result.config(text="La familia especificada no existe.")
+
+                # Verificar si la familia por defecto está presente en la tabla
+                if 'default' not in table:
+                    table['default'] = {'families': {}}
+
+                # Verificar si la familia especificada está presente en la tabla
+                if family_name not in table['default']['families']:
+                    table['default']['families'][family_name] = {}
+
+                # Agregar el registro a la familia especificada
+                table['default']['families'][family_name][column] = {'value': value}
+
+                # Mostrar mensaje de éxito
+                label_result.config(text="Registro agregado exitosamente.")
                 break
-        
+
+        # Mostrar mensaje de error si la tabla no existe
+        if not table_found:
+            label_result.config(text="La tabla especificada no existe.")
+
+
+    # Definir la función para actualizar un registro en una tabla
+    def update_record():
+        # Obtener los datos de la interfaz gráfica
+        table_name1 = entry_table1.get()
+        row_key2 = entry_row_key1.get()
+        family_name1 = entry_family1.get()
+        column_name1 = entry_column_name1.get()
+        new_value1 = entry_new_value1.get()
+
+        # Buscar la tabla en la lista de habilitadas
+        table_found = False
+        for table in tables_enabled:
+            if table['name'] == table_name1:
+                table_found = True
+                # Buscar el registro en la tabla
+                if row_key2 in table:
+                    # Buscar la familia en la tabla
+                    if family_name1 in table[row_key2]['families']:
+                        # Buscar el registro en la familia
+                        if column_name1 in table[row_key2]['families'][family_name1]:
+                            # Actualizar el valor del registro
+                            table[row_key2]['families'][family_name1][column_name1]['value'] = new_value1
+                            # Mostrar mensaje de éxito
+                            label_result.config(text="Registro actualizado exitosamente.")
+                        else:
+                            # Mostrar mensaje de error si la columna no existe en el registro
+                            label_result.config(text="La columna especificada no existe en el registro.")
+                    else:
+                        # Mostrar mensaje de error si la familia no existe en la tabla
+                        label_result.config(text="La familia especificada no existe en la tabla.")
+                else:
+                    # Mostrar mensaje de error si el registro no existe en la tabla
+                    label_result.config(text="El registro especificado no existe en la tabla.")
+                break
+
         # Mostrar mensaje de error si la tabla no existe
         if not table_found:
             label_result.config(text="La tabla especificada no existe.")
@@ -51,7 +91,7 @@ def ventana_put():
     entry_table = tk.Entry(ventana2)
     entry_table.grid(row=0, column=1, padx=5, pady=5)
 
-    label_row_key = tk.Label(ventana2, text="Row key:")
+    label_row_key = tk.Label(ventana2, text="Clave:")
     label_row_key.grid(row=1, column=0, padx=5, pady=5)
     entry_row_key = tk.Entry(ventana2)
     entry_row_key.grid(row=1, column=1, padx=5, pady=5)
@@ -61,21 +101,71 @@ def ventana_put():
     entry_family = tk.Entry(ventana2)
     entry_family.grid(row=2, column=1, padx=5, pady=5)
 
-    label_family = tk.Label(ventana2, text="Columna:")
-    label_family.grid(row=3, column=0, padx=5, pady=5)
-    entry_family = tk.Entry(ventana2)
-    entry_family.grid(row=3, column=1, padx=5, pady=5)
+    label_column = tk.Label(ventana2, text="Columna:")
+    label_column.grid(row=3, column=0, padx=5, pady=5)
+    entry_column = tk.Entry(ventana2)
+    entry_column.grid(row=3, column=1, padx=5, pady=5)
 
     label_value = tk.Label(ventana2, text="Valor:")
     label_value.grid(row=4, column=0, padx=5, pady=5)
     entry_value = tk.Entry(ventana2)
     entry_value.grid(row=4, column=1, padx=5, pady=5)
 
-    button_put = tk.Button(ventana2, text="PUT", command=put_record)
-    button_put.grid(row=4, column=1, padx=5, pady=5)
+    button_put = tk.Button(ventana2, text="Agregar registro", command=put_record)
+    button_put.grid(row=5, column=0, padx=5, pady=5)
+
+    label_table1 = tk.Label(ventana2, text="Tabla:")
+    x = 330
+    y = 10
+    label_table1.place(x=x, y=y)
+    entry_table1 = tk.Entry(ventana2)
+    x = 380
+    y = 10
+    entry_table1.place(x=x, y=y)
+
+    label_row_key1 = tk.Label(ventana2, text="Clave:")
+    x = 330
+    y = 35
+    label_row_key1.place(x=x, y=y)
+    entry_row_key1 = tk.Entry(ventana2)
+    x = 380
+    y = 35
+    entry_row_key1.place(x=x, y=y)
+
+    label_family1 = tk.Label(ventana2, text="Familia:")
+    x = 330
+    y = 60
+    label_family1.place(x=x, y=y)
+    entry_family1 = tk.Entry(ventana2)
+    x = 380
+    y = 60
+    entry_family1.place(x=x, y=y)
+
+    label_column_name1 = tk.Label(ventana2, text="Nombre de la columna:")
+    x = 330
+    y = 85
+    label_column_name1.place(x=x, y=y)
+    entry_column_name1 = tk.Entry(ventana2)
+    x = 380
+    y = 85
+    entry_column_name1.place(x=x, y=y)
+
+    label_new_value1 = tk.Label(ventana2, text="Nuevo valor:")
+    x = 330
+    y = 110
+    label_new_value1.place(x=x, y=y)
+    entry_new_value1 = tk.Entry(ventana2)
+    x = 410
+    y = 110
+    entry_new_value1.place(x=x, y=y)
+
+    button_update = tk.Button(ventana2, text="Actualizar registro", command=update_record)
+    x = 330
+    y = 140
+    button_update.place(x=x, y=y)
 
     label_result = tk.Label(ventana2, text="")
-    label_result.grid(row=5, column=1, padx=5, pady=5)
+    label_result.grid(row=9, column=0, columnspan=2, padx=5, pady=5)
 
     ventana2.geometry("500x300")
     # Agregar un botón a la nueva ventana que cierre la ventana actual y muestre la ventana principal de nuevo
@@ -95,52 +185,34 @@ def ventana_get():
     ventana2.title("Funcion Get")
 
     def get_record(table_name, row_key):
-    # buscar la tabla en la lista de habilitadas
+        # Buscar la tabla en la lista de habilitadas
         for table in tables_enabled:
             if table['name'] == table_name:
-                # buscar la fila en las familias y retornar el valor
-                for family_options in table['families'].values():
-                    if family_options['row_key'] == row_key:
-                        return family_options['value']
+                # Buscar la fila en las familias y retornar el valor
+                for family_name, family_options in table['families'].items():
+                    if row_key in family_options['value']:
+                        result_text.delete(1.0, tk.END) # Limpiar el cuadro de texto de resultados
+                        result_text.insert(tk.END, f"Table: {table_name}\nRowkey: {row_key}\nFamily: {family_name}\nValue: {family_options['value'][row_key]}")
+                        return
 
-        # si la tabla no se encuentra en la lista de habilitadas, retornar mensaje de error
-        return f"Table {table_name} not found"
-
-
-    def get_data():
-        # obtener los valores de los campos de entrada
-        table_name = table_name_entry.get()
-        row_key = row_key_entry.get()
-
-        # llamar a la función get_record y obtener el valor retornado
-        value = get_record(table_name, int(row_key))
-
-        # actualizar el texto en el campo de salida
-        output_text.set(value)
+        # Si la tabla no se encuentra en la lista de habilitadas, mostrar mensaje de error
+        result_text.delete(1.0, tk.END) # Limpiar el cuadro de texto de resultados
+        result_text.insert(tk.END, f"Table {table_name} not found")
 
 
-    table_name_label = tk.Label(ventana2, text="Nombre de la Tabla:")
+    # Crear los cuadros de entrada de texto
     table_name_entry = tk.Entry(ventana2)
-
-    row_key_label = tk.Label(ventana2, text="Row Key:")
+    table_name_entry.pack()
     row_key_entry = tk.Entry(ventana2)
+    row_key_entry.pack()
 
-    get_button = tk.Button(ventana2, text="Get", command=get_data)
+    # Crear el cuadro de texto de resultados
+    result_text = tk.Text(ventana2)
+    result_text.pack()
 
-    output_text = tk.StringVar()
-    output_label = tk.Label(ventana2, textvariable=output_text)
-
-    # posicionar los widgets en la ventana
-    table_name_label.grid(row=0, column=0)
-    table_name_entry.grid(row=0, column=1)
-
-    row_key_label.grid(row=1, column=0)
-    row_key_entry.grid(row=1, column=1)
-
-    get_button.grid(row=2, column=0)
-
-    output_label.grid(row=3, column=0, columnspan=2)
-
+    # Crear el botón de búsqueda y asociarlo a la función get_record
+    search_button = tk.Button(ventana2, text="Buscar", command=lambda: get_record(table_name_entry.get(), row_key_entry.get()))
+    search_button.pack()
 
     ventana2.geometry("500x300")
     # Agregar un botón a la nueva ventana que cierre la ventana actual y muestre la ventana principal de nuevo
@@ -173,6 +245,37 @@ def ventana_delete():
     # Crear una nueva ventana
     ventana2 = tk.Toplevel()
     ventana2.title("Funcion Delete")
+
+   
+    # Función para buscar un valor en la tabla
+    def buscar_valor():
+        # Obtiene el valor de búsqueda ingresado por el usuario
+        valor = valor_entry.get()
+        
+        # Busca el valor en todas las filas y columnas de la tabla
+        for fila, columnas in tables_enabled['name'].items():
+            for familia, datos in columnas['families'].items():
+                for columna, valores in datos.items():
+                    if valor in valores.values():
+                        # Imprime un mensaje que indica dónde se encontró el valor
+                        print(f'Valor "{valor}" encontrado en la fila "{fila}", familia "{familia}", columna "{columna}"')
+        
+        # Si el valor no se encontró en la tabla, muestra un mensaje en la consola
+        if valor not in str(tables_enabled):
+            print(f'Valor "{valor}" no encontrado en la tabla')
+
+
+    # Crea la etiqueta y la entrada para el valor de búsqueda
+    valor_label = tk.Label(ventana2, text='Valor:')
+    valor_entry = tk.Entry(ventana2)
+
+    # Agrega los elementos a la ventana
+    valor_label.pack(pady=5)
+    valor_entry.pack()
+    buscar_valor_btn = tk.Button(ventana2, text='Buscar valor', command=buscar_valor)
+    buscar_valor_btn.pack(pady=10)
+
+
 
     ventana2.geometry("500x300")
    # Agregar un botón a la nueva ventana que cierre la ventana actual y muestre la ventana principal de nuevo
