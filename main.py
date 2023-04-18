@@ -1,9 +1,105 @@
 import tkinter as tk
 import random
+from tkinter import messagebox
 
 # Función para cerrar la ventana
 def salir():
     ventana.destroy()
+
+# Función para crear la nueva ventana
+def ventana_datos():
+    # Ocultar la ventana principal
+    ventana.withdraw()
+
+    # Crear una nueva ventana
+    ventana2 = tk.Toplevel()
+    ventana2.title("Funcion Datos")
+
+
+    def generar_datos_aleatorios(num_datos):
+        datos = []
+        numeros_hospitales = set() # Conjunto para almacenar los números de hospitales generados
+        for _ in range(num_datos):
+            datos_hospital = {}
+            numero_hospital = random.randint(1, 1000)
+            # Verificar que el número de hospital no se repita
+            while numero_hospital in numeros_hospitales:
+                numero_hospital = random.randint(1, 1000)
+            numeros_hospitales.add(numero_hospital)
+            datos_hospital['name'] = f'hospital_{numero_hospital}'
+            paciente_numero = random.randint(1, 100)
+            paciente_key = 'Paciente_' + str(paciente_numero)
+            datos_hospital[paciente_key] = {}
+            datos_hospital[paciente_key]['families'] = {}
+            datos_hospital[paciente_key]['families']['informacion_personal'] = {}
+            datos_hospital[paciente_key]['families']['informacion_personal']['nombre'] = {}
+            datos_hospital[paciente_key]['families']['informacion_personal']['nombre']['value'] = generar_nombre_aleatorio()
+            datos_hospital[paciente_key]['families']['informacion_personal']['nombre']['timestamp'] = generar_timestamp()
+            datos_hospital[paciente_key]['families']['antecedentes'] = {}
+            datos_hospital[paciente_key]['families']['antecedentes']['registros'] = {}
+            datos_hospital[paciente_key]['families']['antecedentes']['registros']['value'] = generar_registro_aleatorio()
+            datos_hospital[paciente_key]['families']['antecedentes']['registros']['timestamp'] = generar_timestamp()
+            datos_hospital[paciente_key]['families']['enfermedad'] = {}
+            datos_hospital[paciente_key]['families']['enfermedad']['padece'] = {}
+            datos_hospital[paciente_key]['families']['enfermedad']['padece']['value'] = generar_enfermedad_aleatoria()
+            datos_hospital[paciente_key]['families']['enfermedad']['padece']['timestamp'] = generar_timestamp()
+            datos.append(datos_hospital)
+
+        return datos
+
+    def generar_nombre_aleatorio():
+        nombres = ['Kevin Eagle', 'Erick Bar', 'Luisa Smith', 'María Rodríguez', 'Pedro Pérez', 'Ana Gómez']
+        return random.choice(nombres)
+
+    def generar_registro_aleatorio():
+        opciones = ['Si', 'No']
+        return random.choice(opciones)
+
+    def generar_enfermedad_aleatoria():
+        enfermedades = ['Infección del oído', 'Infección del estómago', 'Gripe', 'Asma', 'Diabetes']
+        return random.choice(enfermedades)
+
+    def generar_timestamp():
+        return random.randint(1000000000, 9999999999)
+
+    def generar():
+        try:
+            num_datos = int(entry_num_datos.get())
+            nuevos_datos = generar_datos_aleatorios(num_datos)
+            # Agregar los nuevos datos a la lista de datos habilitados
+            tables_enabled.extend(nuevos_datos)
+            messagebox.showinfo('Datos generados', f'Se generaron y se añadieron a la lista {num_datos} datos aleatorios.')
+        except ValueError:
+            messagebox.showerror('Error', 'Por favor ingrese un número válido para la cantidad de datos a generar.')
+
+    def mostrar():
+        contenido = ''
+        for dato in tables_enabled:
+            contenido += str(dato) + '\n'
+        messagebox.showinfo('Datos Habilitados', contenido)
+
+
+    # Crear campo de entrada para el número de datos
+    label_num_datos = tk.Label(ventana2, text='Número de Datos:')
+    label_num_datos.pack()
+    entry_num_datos = tk.Entry(ventana2)
+    entry_num_datos.pack()
+
+    # Crear botón para generar datos
+    btn_generar = tk.Button(ventana2, text='Generar', command=generar)
+    btn_generar.pack()
+
+    # Crear botón para mostrar datos
+    btn_mostrar = tk.Button(ventana2, text='Mostrar', command=mostrar)
+    btn_mostrar.pack()
+
+
+    ventana2.geometry("500x300")
+    # Agregar un botón a la nueva ventana que cierre la ventana actual y muestre la ventana principal de nuevo
+    boton_volver = tk.Button(ventana2, text="Regresar a Menú", command=lambda:[ventana2.destroy(), ventana.deiconify()])
+    x = 390
+    y = 265
+    boton_volver.place(x=x, y=y)
 
 def ventana_put():
     # Crear una nueva ventana
@@ -411,22 +507,21 @@ def ventana_list():
         for tabla in tables_enabled:
             # Obtener el nombre de la tabla
             tabla_name = tabla['name']
-            # Obtener la cantidad de familias de la tabla
-            if 'families' in tabla['default']:
-                tabla_families = len(tabla['default']['families'])
-            else:
-                tabla_families = 0
+            # Obtener la cantidad de filas de la tabla
+            tabla_rows = tabla.get(1, {}).get('families', {})
             # Agregar la fila a la salida
-            texto_salida.insert(tk.END, f"{tabla_name}\t{tabla_families} rows(s)\n")
+            texto_salida.insert(tk.END, f"{tabla_name}\t{tabla_rows} row(s)\n")
 
         # Agregar el total de filas al final de la salida
         if len(tables_enabled) > 1:
-            texto_salida.insert(tk.END, f"{len(tables_enabled)} rows(s)\n")
+            total_rows = sum(tabla[1].get('families', {}) for tabla in tables_enabled)
+            texto_salida.insert(tk.END, f"{total_rows} rows(s)\n")
         else:
-            texto_salida.insert(tk.END, f"{len(tables_enabled)} row(s)\n")
+            texto_salida.insert(tk.END, f"{tabla_rows} row(s)\n")
 
         # Agregar un separador de línea
         texto_salida.insert(tk.END, '-'*20)
+
 
         
 
@@ -812,6 +907,13 @@ etiqueta_funciones.pack()
 x = 10
 y = 30
 etiqueta_funciones.place(x=x, y=y)
+
+# Agregar un botón a la ventana principal que abra una nueva ventana al hacer clic
+boton = tk.Button(ventana, text="DATOS", command=ventana_datos)
+x = 150
+y = 70
+boton.place(x=x, y=y)
+
 
 # Agregar un botón a la ventana principal que abra una nueva ventana al hacer clic
 boton = tk.Button(ventana, text="PUT", command=ventana_put)
