@@ -13,8 +13,7 @@ def ventana_datos():
 
     # Crear una nueva ventana
     ventana2 = tk.Toplevel()
-    ventana2.title("Funcion Datos")
-
+    ventana2.title("Funcion Scan")
 
     def generar_datos_aleatorios(num_datos):
         datos = []
@@ -92,7 +91,6 @@ def ventana_datos():
     # Crear botón para mostrar datos
     btn_mostrar = tk.Button(ventana2, text='Mostrar', command=mostrar)
     btn_mostrar.pack()
-
 
     ventana2.geometry("500x300")
     # Agregar un botón a la nueva ventana que cierre la ventana actual y muestre la ventana principal de nuevo
@@ -501,29 +499,18 @@ def ventana_list():
         texto_salida.delete('1.0', tk.END)
 
         # Agregar encabezado a la salida
-        texto_salida.insert(tk.END, "Table\n")
+        texto_salida.insert(tk.END, "Table\tFamilies\n")
 
         # Iterar sobre la lista de tablas y construir la salida
         for tabla in tables_enabled:
-            # Obtener el nombre de la tabla
+            # Obtener el nombre de la tabla y la cantidad de families
             tabla_name = tabla['name']
-            # Obtener la cantidad de filas de la tabla
-            tabla_rows = tabla.get(1, {}).get('families', {})
+            tabla_families = len(list(tabla.values())[1]['families'])
             # Agregar la fila a la salida
-            texto_salida.insert(tk.END, f"{tabla_name}\t{tabla_rows} row(s)\n")
-
-        # Agregar el total de filas al final de la salida
-        if len(tables_enabled) > 1:
-            total_rows = sum(tabla[1].get('families', {}) for tabla in tables_enabled)
-            texto_salida.insert(tk.END, f"{total_rows} rows(s)\n")
-        else:
-            texto_salida.insert(tk.END, f"{tabla_rows} row(s)\n")
+            texto_salida.insert(tk.END, f"{tabla_name}\t{tabla_families}\n")
 
         # Agregar un separador de línea
-        texto_salida.insert(tk.END, '-'*20)
-
-
-        
+        texto_salida.insert(tk.END, '-'*20)        
 
     # Agregar un widget Text para mostrar la salida
     texto_salida = tk.Text(ventana2, height=10, width=40)
@@ -642,7 +629,7 @@ def ventana_alter():
     ventana2 = tk.Toplevel()
     ventana2.title("Funcion Alter")
 
-
+    """
     # Define una función para modificar la definición de la tabla
     def alter_table_name():
         # Obtener los valores actuales de los atributos que se van a modificar
@@ -695,12 +682,12 @@ def ventana_alter():
     x = 300
     y = 125
     status_label.place(x=x, y=y)
-
+    """
 
 
         # Define una función para modificar la definición de la tabla
     def alter_table_colum():
-        # Obtener los valores actuales de los atributos que se van a modificar
+        # Obtener los nombres de la tabla y las familias a modificar desde las entradas de la GUI
         table_name = name_entry.get()
         old_family_name = old_family_entry.get()
         new_family_name = new_family_entry.get()
@@ -710,26 +697,20 @@ def ventana_alter():
         for table in tables_enabled:
             if table['name'] == table_name:
                 table_found = True
-                # Modificar la definición de la tabla
-                if 'default' in table:
-                    default_data = table['default']
-                    if 'families' in default_data and old_family_name in default_data['families']:
-                        new_families = {}
-                        for key, value in default_data['families'].items():
-                            if key == old_family_name:
-                                new_families[new_family_name] = value
-                            else:
-                                new_families[key] = value
-                        default_data['families'] = new_families
-                        break
 
+                # Buscar la familia en el diccionario de familias del paciente
+                patient_data = table.get(list(table.keys())[1])
+                families_data = patient_data.get('families', {})
+                if old_family_name in families_data:
+                    family_data = families_data.pop(old_family_name)
+                    families_data[new_family_name] = family_data
+                    break
+
+        # Mostrar mensaje de éxito o error
         if table_found:
-            # Actualizar la etiqueta de estado
-            status_label.config(text='La tabla ha sido modificada')
+            messagebox.showinfo('Éxito', f'Se ha modificado la familia de columnas "{old_family_name}" a "{new_family_name}" en la tabla "{table_name}"')
         else:
-            # Actualizar la etiqueta de estado
-            status_label.config(text='La tabla no ha sido encontrada')
-
+            messagebox.showerror('Error', f'La tabla "{table_name}" no se encuentra habilitada')
 
     # Crear las entradas de texto para los atributos
     name_label = tk.Label(ventana2, text='Nombre de la tabla')
@@ -832,13 +813,13 @@ def ventana_describe():
     ventana2.title("Funcion Describe")
 
     # función para simular el comando describe
-    def describe_table(table_name):
+    def describe_table(table_name_entry):
         table_data = None
         table_type = None
 
         # buscar la tabla en la lista de habilitadas
         for table in tables_enabled:
-            if table['name'] == table_name:
+            if table['name'] == table_name_entry:
                 table_data = table
                 table_type = "ENABLE"
                 break
@@ -846,28 +827,36 @@ def ventana_describe():
         # buscar la tabla en la lista de deshabilitadas
         if not table_data:
             for table in tables_disabled:
-                if table['name'] == table_name:
+                if table['name'] == table_name_entry:
                     table_data = table
                     table_type = "DISABLE"
                     break
 
         # si la tabla no se encuentra en ninguna lista
         if not table_data:
-            return f"Table {table_name} not found\n"
+            return f"Table {table_name_entry} not found\n"
 
         # generar la salida para la tabla encontrada
-        table_text = f"Table  {table_name} is {table_type}\n"
-        table_text += f"{table_name}\n"
-        for family_name, family_options in table_data['default']['families'].items():
-            table_text += f"\nNAME => {family_name} \n"
-            for option_name, option_value in family_options.items():
-                table_text += f"     {option_name} => {option_value} \n"
+        table_text = f"Table  {table_name_entry} is {table_type}\n"
+        table_text += f"{table_name_entry}\n"
+
+        # buscar el valor que contiene la clave 'families' en el diccionario
+        for value in table_data.values():
+            if isinstance(value, dict) and 'families' in value:
+                families = value['families']
+                break
+
+        # agregar los datos de cada familia al texto de salida
+        for family_name, family_data in families.items():
+            table_text += f"\nNAME => {family_name}\n"
+            for attribute_name, attribute_data in family_data.items():
+                value = attribute_data.get('value', '')
+                timestamp = attribute_data.get('timestamp', '')
+                table_text += f"{attribute_name}: {value} (timestamp: {timestamp})\n"
+
         return table_text
 
-    def show_table_info():
-        table_name = table_name_entry.get()
-        table_info = describe_table(table_name)
-        result_label.config(text=table_info)
+    
 
     # agregar un campo de texto para ingresar el nombre de la tabla
     table_name_label = tk.Label(ventana2, text="Table Name")
@@ -876,7 +865,7 @@ def ventana_describe():
     table_name_entry.pack()
 
     # agregar un botón para simular el comando describe
-    describe_button = tk.Button(ventana2, text="Describe", command=show_table_info)
+    describe_button = tk.Button(ventana2, text="Describe", command=lambda: result_label.config(text=describe_table(table_name_entry.get())))
     describe_button.pack()
 
     # agregar una etiqueta para mostrar el resultado de describe
