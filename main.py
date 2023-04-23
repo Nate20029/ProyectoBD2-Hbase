@@ -1,6 +1,8 @@
 import tkinter as tk
 import random
 from tkinter import messagebox
+from tkinter import ttk
+import datetime
 
 # Función para cerrar la ventana
 def salir():
@@ -274,7 +276,7 @@ def ventana_put():
     boton_volver.place(x=x, y=y)
 
 
-# Función para crear la nueva ventana
+
 def ventana_get():
     # Ocultar la ventana principal
     ventana.withdraw()
@@ -283,42 +285,69 @@ def ventana_get():
     ventana2 = tk.Toplevel()
     ventana2.title("Funcion Get")
 
-    def get_record(table_name, row_key):
-        # Buscar la tabla en la lista de habilitadas
-        for table in tables_enabled:
-            if table['name'] == table_name:
-                # Buscar la fila en las familias y retornar el valor
-                for family_name, family_options in table['families'].items():
-                    if row_key in family_options['value']:
-                        result_text.delete(1.0, tk.END) # Limpiar el cuadro de texto de resultados
-                        result_text.insert(tk.END, f"Table: {table_name}\nRowkey: {row_key}\nFamily: {family_name}\nValue: {family_options['value'][row_key]}")
-                        return
+    # Crear un marco para los resultados
+    result_frame = tk.Frame(ventana2)
+    result_frame.pack(padx=10, pady=10)
 
-        # Si la tabla no se encuentra en la lista de habilitadas, mostrar mensaje de error
-        result_text.delete(1.0, tk.END) # Limpiar el cuadro de texto de resultados
-        result_text.insert(tk.END, f"Table {table_name} not found")
+    def get_data():
+        # Limpiar el marco de resultados antes de agregar nuevos widgets
+        for widget in result_frame.winfo_children():
+            widget.destroy()
 
+        table_name = table_name_entry.get()
+        key = key_entry.get()
 
-    # Crear los cuadros de entrada de texto
-    table_name_entry = tk.Entry(ventana2)
-    table_name_entry.pack()
-    row_key_entry = tk.Entry(ventana2)
-    row_key_entry.pack()
+        data = next((item for item in tables_enabled if item.get("name") == table_name), None)
+        if data:
+            patient_data = data.get(key, None)
+            if patient_data:
+                families = patient_data.get("families", {})
+                for family, family_data in families.items():
+                    family_label = tk.Label(result_frame, text=f"{family}:")
+                    family_label.pack(anchor="w")
 
-    # Crear el cuadro de texto de resultados
-    result_text = tk.Text(ventana2)
-    result_text.pack()
+                    for subkey, subdata in family_data.items():
+                        timestamp = subdata.get("timestamp", "")
+                        value = subdata.get("value", "")
+                        sublabel_text = f"\t{subkey}\ttimestamp={timestamp}, value={value}"
+                        sublabel = tk.Label(result_frame, text=sublabel_text)
+                        sublabel.pack(anchor="w")
+            else:
+                messagebox.showerror("Error", "La llave no existe en la tabla.")
+        else:
+            messagebox.showerror("Error", "La tabla no existe o no está habilitada.")
 
-    # Crear el botón de búsqueda y asociarlo a la función get_record
-    search_button = tk.Button(ventana2, text="Buscar", command=lambda: get_record(table_name_entry.get(), row_key_entry.get()))
-    search_button.pack()
+        # Actualizar la ventana para mostrar los resultados
+        ventana2.update()
+
+    # Crear marco para los campos de entrada
+    input_frame = tk.Frame(ventana2, padx=10, pady=10)
+    input_frame.pack()
+
+    # Campo de entrada para el nombre de la tabla
+    table_name_label = tk.Label(input_frame, text="Nombre de la tabla:")
+    table_name_label.grid(row=0, column=0)
+    table_name_entry = tk.Entry(input_frame)
+    table_name_entry.grid(row=0, column=1)
+
+    # Campo de entrada para la llave
+    key_label = tk.Label(input_frame, text="Llave:")
+    key_label.grid(row=1, column=0)
+    key_entry = tk.Entry(input_frame)
+    key_entry.grid(row=1, column=1)
+
+    # Botón para enviar los datos
+    submit_button = tk.Button(ventana2, text="Consultar", command=get_data)
+    submit_button.pack()
 
     ventana2.geometry("500x300")
+
     # Agregar un botón a la nueva ventana que cierre la ventana actual y muestre la ventana principal de nuevo
     boton_volver = tk.Button(ventana2, text="Regresar a Menú", command=lambda:[ventana2.destroy(), ventana.deiconify()])
     x = 390
     y = 265
     boton_volver.place(x=x, y=y)
+
 
 # Función para crear la nueva ventana
 def ventana_scan():
