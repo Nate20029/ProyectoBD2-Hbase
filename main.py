@@ -119,16 +119,22 @@ def ventana_put():
             if table['name'] == table_name:
                 table_found = True
 
-                # Verificar si la familia por defecto está presente en la tabla
-                if 'default' not in table:
-                    table['default'] = {'families': {}}
+                # Verificar si la fila especificada está presente en la tabla
+                if row_key not in table:
+                    table[row_key] = {'families': {}}
 
                 # Verificar si la familia especificada está presente en la tabla
-                if family_name not in table['default']['families']:
-                    table['default']['families'][family_name] = {}
+                if family_name not in table[row_key]['families']:
+                    table[row_key]['families'][family_name] = {}
 
-                # Agregar el registro a la familia especificada
-                table['default']['families'][family_name][column] = {'value': value}
+                # Verificar si la columna especificada está presente en la familia especificada
+                if column not in table[row_key]['families'][family_name]:
+                    table[row_key]['families'][family_name][column] = {}
+
+                # Agregar el registro a la columna especificada
+                table[row_key]['families'][family_name][column]['value'] = value
+                timestamp = str(random.randint(1000000000, 9999999999))
+                table[row_key]['families'][family_name][column]['timestamp'] = timestamp
 
                 # Mostrar mensaje de éxito
                 label_result.config(text="Registro agregado exitosamente.")
@@ -137,7 +143,6 @@ def ventana_put():
         # Mostrar mensaje de error si la tabla no existe
         if not table_found:
             label_result.config(text="La tabla especificada no existe.")
-
 
     # Definir la función para actualizar un registro en una tabla
     def update_record():
