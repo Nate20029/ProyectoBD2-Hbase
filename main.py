@@ -358,12 +358,53 @@ def ventana_scan():
     ventana2 = tk.Toplevel()
     ventana2.title("Funcion Scan")
 
-    ventana2.geometry("500x300")
+    def leer_diccionario(table_name, text_widget):
+        table_data = None
+        for table in tables_enabled:
+            if table.get("name") == table_name:
+                table_data = table
+                break
+        if table_data is None:
+            text_widget.insert("end", f"Error: la tabla {table_name} no está habilitada o no existe.\n")
+            return None
+
+        text_widget.insert("end", f"ROW                                      COLUMN+CELL\n")
+        for key, value in table_data.items():
+            if key != "name":
+                families = value.get("families")
+                for family_name, family_data in families.items():
+                    for column_name, column_data in family_data.items():
+                        row = key
+                        column = f"{family_name}:{column_name}"
+                        value = column_data.get("value")
+                        timestamp = column_data.get("timestamp")
+                        text_widget.insert("end", f" {row}                                    column={column}, timestamp={timestamp}, value={value}\n")
+        text_widget.insert("end", f"{len(table_data) - 1} row(s) in 0.0450 seconds\n")
+
+
+
+    # Creamos un widget de texto para mostrar los resultados
+    result_text = tk.Text(ventana2, height=20, width=150)
+    result_text.pack()
+
+  
+    ventana2.geometry("1100x500")
+    # Crear un campo de texto para que el usuario ingrese el nombre de la tabla
+    label_table = tk.Label(ventana2, text="Nombre de la tabla:")
+    label_table.pack()
+    entry_table = tk.Entry(ventana2)
+    entry_table.pack()
+
+    # Agregar un botón a la nueva ventana que ejecute la función leer_diccionario con el nombre de la tabla ingresado
+    boton_leer = tk.Button(ventana2, text="Leer Tabla", command=lambda: leer_diccionario(entry_table.get(), result_text))
+    boton_leer.pack()
+
     # Agregar un botón a la nueva ventana que cierre la ventana actual y muestre la ventana principal de nuevo
     boton_volver = tk.Button(ventana2, text="Regresar a Menú", command=lambda:[ventana2.destroy(), ventana.deiconify()])
     x = 390
-    y = 265
+    y = 465
     boton_volver.place(x=x, y=y)
+
 
 # Función para crear la nueva ventana
 def ventana_delete():
