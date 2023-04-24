@@ -804,6 +804,64 @@ def ventana_alter():
     """
 
 
+    def eliminar_familia():
+        # Obtener el nombre de la tabla y de la familia de columnas desde las entradas de la GUI
+        nombre_tabla = tabla_entry.get()
+        familia_columnas = familia_entry.get()
+
+        # Buscar la tabla en la lista de tablas habilitadas
+        table_found = False
+        for table in tables_enabled:
+            if table['name'] == nombre_tabla:
+                table_found = True
+
+                # Buscar el rowkey
+                rowkey = list(table.keys())[1]
+
+                # Buscar la familia en el diccionario de familias del paciente
+                patient_data = table[rowkey]
+                families_data = patient_data.get('families', {})
+                if familia_columnas in families_data:
+                    del families_data[familia_columnas]
+                    messagebox.showinfo('Éxito', f'Se ha eliminado la familia de columnas "{familia_columnas}" de la tabla "{nombre_tabla}"')
+                    return
+                else:
+                    messagebox.showerror('Error', f'No se encontró la familia de columnas "{familia_columnas}" en la tabla "{nombre_tabla}"')
+                    return
+        if not table_found:
+            messagebox.showerror('Error', f'No se encontró la tabla "{nombre_tabla}"')
+
+
+
+
+    # Crear los widgets de entrada de la GUI
+    tabla_label = tk.Label(ventana2, text='Nombre de la tabla:')
+    # Mostrar los elementos en la ventana
+    x = 300
+    y = 35
+    tabla_label.place(x=x, y=y)
+    tabla_entry = tk.Entry(ventana2)
+    # Mostrar los elementos en la ventana
+    x = 300
+    y = 55
+    tabla_entry.place(x=x, y=y)
+
+    familia_label = tk.Label(ventana2, text='Nombre de la familia de columnas:')
+    x = 300
+    y = 75
+    familia_label.place(x=x, y=y)
+    familia_entry = tk.Entry(ventana2)
+    x = 300
+    y = 95
+    familia_entry.place(x=x, y=y)
+
+    # Crear el botón para ejecutar la función eliminar_familia
+    eliminar_button = tk.Button(ventana2, text='Eliminar', command=eliminar_familia)
+    x = 300
+    y = 125
+    eliminar_button.place(x=x, y=y)
+
+
         # Define una función para modificar la definición de la tabla
     def alter_table_colum():
         # Obtener los nombres de la tabla y las familias a modificar desde las entradas de la GUI
