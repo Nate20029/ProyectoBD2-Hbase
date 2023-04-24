@@ -425,8 +425,7 @@ def ventana_delete():
     columna_label = tk.Label(ventana2, text='Nombre de la columna a eliminar')
     columna_entry = tk.Entry(ventana2)
 
-    
-    
+      
 
     # Función que se ejecutará al hacer clic en el botón "Eliminar"
     def eliminar_valor_familia():
@@ -457,6 +456,45 @@ def ventana_delete():
     columna_label.pack()
     columna_entry.pack()
     
+
+    def eliminar_valor_familia():
+        # Obtener los nombres de la tabla y la clave a modificar desde las entradas de la GUI
+        nombre_tabla = tabla_entry.get()
+        key = key_entry.get()
+
+        # Buscar la tabla en la lista de tablas habilitadas
+        for table in tables_enabled:
+            if table['name'] == nombre_tabla:
+                if key in table:
+                    # Eliminar la clave de la tabla
+                    del table[key]
+                    return table
+                else:
+                    messagebox.showerror('Error', f'No se encontró la clave de fila "{key}" en la tabla "{nombre_tabla}"')
+                    return None
+        messagebox.showerror('Error', f'No se encontró la tabla "{nombre_tabla}"')
+        return None
+
+
+
+    # Crear dos entradas de texto para la tabla y la clave
+    tabla_entry = tk.Entry(ventana2)
+    x = 300
+    y = 25
+    tabla_entry.place(x=x, y=y)
+    key_entry = tk.Entry(ventana2)
+    x = 300
+    y = 50
+    key_entry.place(x=x, y=y)
+
+
+    # Crear un botón que llame a la función eliminar_valor_familia cuando se hace clic en él
+    boton_eliminar = tk.Button(ventana2, text="Eliminar", command=lambda: eliminar_valor_familia())
+    x = 300
+    y = 75
+    boton_eliminar.place(x=x, y=y)
+
+
 
     # Crear el botón para eliminar el valor de la columna
     eliminar_button = tk.Button(ventana2, text='Eliminar valor de columna', command=eliminar_valor_familia)
@@ -521,6 +559,29 @@ def ventana_truncate():
     # Crear una nueva ventana
     ventana2 = tk.Toplevel()
     ventana2.title("Funcion Truncate")
+
+    def eliminar_tabla(nombre_tabla):
+        # Buscar la tabla en la lista de tablas habilitadas
+        for table in tables_enabled:
+            if table['name'] == nombre_tabla:
+                # Eliminar todas las claves de la tabla
+                table.clear()
+                table['name'] = nombre_tabla
+                messagebox.showinfo('Éxito', f'Se han eliminado todas las filas de la tabla "{nombre_tabla}"')
+                return table
+        messagebox.showerror('Error', f'No se encontró la tabla "{nombre_tabla}"')
+        return None
+
+
+
+    # Crear los widgets de la interfaz gráfica de usuario
+    tk.Label(ventana2, text='Nombre de la tabla:').grid(row=0, column=0)
+    tabla_entry = tk.Entry(ventana2)
+    tabla_entry.grid(row=0, column=1)
+    eliminar_button = tk.Button(ventana2, text='Eliminar', command=lambda: eliminar_tabla(tabla_entry.get()))
+    eliminar_button.grid(row=1, column=0, columnspan=2)
+
+
 
     ventana2.geometry("500x300")
     # Agregar un botón a la nueva ventana que cierre la ventana actual y muestre la ventana principal de nuevo
