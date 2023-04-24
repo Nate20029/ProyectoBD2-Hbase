@@ -415,39 +415,55 @@ def ventana_delete():
     ventana2 = tk.Toplevel()
     ventana2.title("Funcion Delete")
 
-   
-    # Función para buscar un valor en la tabla
-    def buscar_valor():
-        # Obtiene el valor de búsqueda ingresado por el usuario
-        valor = valor_entry.get()
-        
-        # Busca el valor en todas las filas y columnas de la tabla
-        for fila, columnas in tables_enabled['name'].items():
-            for familia, datos in columnas['families'].items():
-                for columna, valores in datos.items():
-                    if valor in valores.values():
-                        # Imprime un mensaje que indica dónde se encontró el valor
-                        print(f'Valor "{valor}" encontrado en la fila "{fila}", familia "{familia}", columna "{columna}"')
-        
-        # Si el valor no se encontró en la tabla, muestra un mensaje en la consola
-        if valor not in str(tables_enabled):
-            print(f'Valor "{valor}" no encontrado en la tabla')
+    # Crear las entradas de texto para los atributos
+    tabla_label = tk.Label(ventana2, text='Nombre de la tabla')
+    tabla_entry = tk.Entry(ventana2)
+    key_label = tk.Label(ventana2, text='Clave de fila')
+    key_entry = tk.Entry(ventana2)
+    familia_label = tk.Label(ventana2, text='Nombre de la familia de columnas')
+    familia_entry = tk.Entry(ventana2)
+    columna_label = tk.Label(ventana2, text='Nombre de la columna a eliminar')
+    columna_entry = tk.Entry(ventana2)
 
+    
+    
 
-    # Crea la etiqueta y la entrada para el valor de búsqueda
-    valor_label = tk.Label(ventana2, text='Valor:')
-    valor_entry = tk.Entry(ventana2)
+    # Función que se ejecutará al hacer clic en el botón "Eliminar"
+    def eliminar_valor_familia():
+        # Obtener los nombres de la tabla, key, familia y columna a modificar desde las entradas de la GUI
+        nombre_tabla = tabla_entry.get()
+        key = key_entry.get()
+        familia_columnas = familia_entry.get()
+        nombre_columna = columna_entry.get()
 
-    # Agrega los elementos a la ventana
-    valor_label.pack(pady=5)
-    valor_entry.pack()
-    buscar_valor_btn = tk.Button(ventana2, text='Buscar valor', command=buscar_valor)
-    buscar_valor_btn.pack(pady=10)
+        # Buscar la tabla en la lista de tablas habilitadas
+        for table in tables_enabled:
+            if table['name'] == nombre_tabla:
+                if key in table and familia_columnas in table[key]['families'] and nombre_columna in table[key]['families'][familia_columnas]:
+                    del table[key]['families'][familia_columnas][nombre_columna]
+                    messagebox.showinfo('Éxito', f'Se ha eliminado el valor de "{nombre_columna}" en la familia de columnas "{familia_columnas}" de la tabla "{nombre_tabla}"')
+                    return
+                else:
+                    messagebox.showerror('Error', f'No se encontró la clave de fila "{key}" o la familia de columnas "{familia_columnas}" o la columna "{nombre_columna}" en la tabla "{nombre_tabla}"')
+                    return
+        messagebox.showerror('Error', f'No se encontró la tabla "{nombre_tabla}"')
+    # Agregar las entradas de texto y botón a la ventana
+    tabla_label.pack()
+    tabla_entry.pack()
+    key_label.pack()
+    key_entry.pack()
+    familia_label.pack()
+    familia_entry.pack()
+    columna_label.pack()
+    columna_entry.pack()
+    
 
-
-
+    # Crear el botón para eliminar el valor de la columna
+    eliminar_button = tk.Button(ventana2, text='Eliminar valor de columna', command=eliminar_valor_familia)
+    eliminar_button.pack()
     ventana2.geometry("500x300")
-   # Agregar un botón a la nueva ventana que cierre la ventana actual y muestre la ventana principal de nuevo
+
+    # Agregar un botón a la nueva ventana que cierre la ventana actual y muestre la ventana principal de nuevo
     boton_volver = tk.Button(ventana2, text="Regresar a Menú", command=lambda:[ventana2.destroy(), ventana.deiconify()])
     x = 390
     y = 265
@@ -461,6 +477,34 @@ def ventana_count():
     # Crear una nueva ventana
     ventana2 = tk.Toplevel()
     ventana2.title("Funcion Count")
+
+    def count_rows(table_name, data):
+        for table in data:
+            if table['name'] == table_name:
+                count = len(table.get(list(table.keys())[1], {}))
+                return count
+        return 0
+
+    def count_rows_gui():
+        # Obtener el valor ingresado por el usuario en la entrada de texto
+        table_name = entry.get()
+        # Obtener y mostrar el resultado de la función count_rows
+        count = count_rows(table_name, tables_enabled)
+        count_label.config(text=count)
+
+
+    # Crear entrada de texto
+    entry = tk.Entry(ventana2)
+    entry.pack()
+
+    # Crear botón para contar filas
+    button = tk.Button(ventana2, text="Contar filas", command=count_rows_gui)
+    button.pack()
+
+    # Crear Label para mostrar el resultado
+    count_label = tk.Label(ventana2, text="")
+    count_label.pack()
+
 
     ventana2.geometry("500x300")
     # Agregar un botón a la nueva ventana que cierre la ventana actual y muestre la ventana principal de nuevo
