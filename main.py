@@ -679,18 +679,18 @@ def ventana_list():
         texto_salida.delete('1.0', tk.END)
 
         # Agregar encabezado a la salida
-        texto_salida.insert(tk.END, "Table\tFamilies\n")
+        texto_salida.insert(tk.END, "Table\tKeys\n")
 
         # Iterar sobre la lista de tablas y construir la salida
         for tabla in tables_enabled:
-            # Obtener el nombre de la tabla y la cantidad de families
+            # Obtener el nombre de la tabla y el número total de claves
             tabla_name = tabla['name']
-            tabla_families = len(list(tabla.values())[1]['families'])
+            tabla_keys = len(tabla.keys()) - 1 # restar 1 para excluir el nombre de la tabla
             # Agregar la fila a la salida
-            texto_salida.insert(tk.END, f"{tabla_name}\t{tabla_families}\n")
+            texto_salida.insert(tk.END, f"{tabla_name}\t{tabla_keys}\n")
 
         # Agregar un separador de línea
-        texto_salida.insert(tk.END, '-'*20)        
+        texto_salida.insert(tk.END, '-'*20)     
 
     # Agregar un widget Text para mostrar la salida
     texto_salida = tk.Text(ventana2, height=10, width=40)
