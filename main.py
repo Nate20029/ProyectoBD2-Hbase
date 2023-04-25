@@ -471,18 +471,18 @@ def ventana_delete():
 
     # Crear dos entradas de texto para la tabla y la clave
     tabla_entry1 = tk.Entry(ventana2)
-    x = 300
+    x = 450
     y = 25
     tabla_entry1.place(x=x, y=y)
     key_entry1 = tk.Entry(ventana2)
-    x = 300
+    x = 450
     y = 50
     key_entry1.place(x=x, y=y)
 
 
     # Crear un botón que llame a la función eliminar_valor_familia cuando se hace clic en él
     boton_eliminar = tk.Button(ventana2, text="Eliminar", command=lambda: eliminar_valor_familia1())
-    x = 300
+    x = 450
     y = 75
     boton_eliminar.place(x=x, y=y)
 
@@ -491,7 +491,7 @@ def ventana_delete():
     # Crear el botón para eliminar el valor de la columna
     eliminar_button = tk.Button(ventana2, text='Eliminar valor de columna', command=eliminar_valor_familia)
     eliminar_button.pack()
-    ventana2.geometry("500x300")
+    ventana2.geometry("700x300")
 
     # Agregar un botón a la nueva ventana que cierre la ventana actual y muestre la ventana principal de nuevo
     boton_volver = tk.Button(ventana2, text="Regresar a Menú", command=lambda:[ventana2.destroy(), ventana.deiconify()])
@@ -943,6 +943,7 @@ def ventana_alter():
     def alter_table_colum():
         # Obtener los nombres de la tabla y las familias a modificar desde las entradas de la GUI
         table_name = name_entry.get()
+        key1 = key_entry1.get()
         old_family_name = old_family_entry.get()
         new_family_name = new_family_entry.get()
 
@@ -952,8 +953,21 @@ def ventana_alter():
             if table['name'] == table_name:
                 table_found = True
 
+                # Buscar el rowkey utilizando el valor ingresado por el usuario
+                rowkey = None
+                for k in table.keys():
+                    if k == key1:
+                        rowkey = k
+                        break
+
+                if rowkey is None:
+                    messagebox.showerror('Error', f'No se encontró el rowkey "{key}" en la tabla "{nombre_tabla}"')
+                    return
+                
+
+
                 # Buscar la familia en el diccionario de familias del paciente
-                patient_data = table.get(list(table.keys())[1])
+                patient_data = table[rowkey]
                 families_data = patient_data.get('families', {})
                 if old_family_name in families_data:
                     family_data = families_data.pop(old_family_name)
@@ -969,6 +983,8 @@ def ventana_alter():
     # Crear las entradas de texto para los atributos
     name_label = tk.Label(ventana2, text='Nombre de la tabla')
     name_entry = tk.Entry(ventana2)
+    key1_label = tk.Label(ventana2, text='Key')
+    key_entry1 = tk.Entry(ventana2)
     old_family_label = tk.Label(ventana2, text='Nombre de la familia de columnas a modificar')
     old_family_entry = tk.Entry(ventana2)
     new_family_label = tk.Label(ventana2, text='Nuevo nombre de la familia de columnas')
@@ -989,18 +1005,24 @@ def ventana_alter():
     name_entry.place(x=x, y=y)
     x = 10
     y = 75
-    old_family_label.place(x=x, y=y)
+    key1_label.place(x=x, y=y)
     x = 10
     y = 95
-    old_family_entry.place(x=x, y=y)
+    key_entry1.place(x=x, y=y)
     x = 10
     y = 125
-    new_family_label.place(x=x, y=y)
+    old_family_label.place(x=x, y=y)
     x = 10
     y = 145
-    new_family_entry.place(x=x, y=y)
+    old_family_entry.place(x=x, y=y)
     x = 10
     y = 165
+    new_family_label.place(x=x, y=y)
+    x = 10
+    y = 185
+    new_family_entry.place(x=x, y=y)
+    x = 10
+    y = 205
     alter_button.place(x=x, y=y)
 
 
