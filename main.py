@@ -73,11 +73,6 @@ def ventana_datos():
         except ValueError:
             messagebox.showerror('Error', 'Por favor ingrese un número válido para la cantidad de datos a generar.')
 
-    def mostrar():
-        contenido = ''
-        for dato in tables_enabled:
-            contenido += str(dato) + '\n'
-        messagebox.showinfo('Datos Habilitados', contenido)
 
 
     # Crear campo de entrada para el número de datos
@@ -90,9 +85,6 @@ def ventana_datos():
     btn_generar = tk.Button(ventana2, text='Generar', command=generar)
     btn_generar.pack()
 
-    # Crear botón para mostrar datos
-    btn_mostrar = tk.Button(ventana2, text='Mostrar', command=mostrar)
-    btn_mostrar.pack()
 
     ventana2.geometry("500x300")
     # Agregar un botón a la nueva ventana que cierre la ventana actual y muestre la ventana principal de nuevo
@@ -457,39 +449,39 @@ def ventana_delete():
     columna_entry.pack()
     
 
-    def eliminar_valor_familia():
+    def eliminar_valor_familia1():
         # Obtener los nombres de la tabla y la clave a modificar desde las entradas de la GUI
-        nombre_tabla = tabla_entry.get()
-        key = key_entry.get()
+        nombre_tabla1 = tabla_entry1.get()
+        key1 = key_entry1.get()
 
         # Buscar la tabla en la lista de tablas habilitadas
         for table in tables_enabled:
-            if table['name'] == nombre_tabla:
-                if key in table:
+            if table['name'] == nombre_tabla1:
+                if key1 in table:
                     # Eliminar la clave de la tabla
-                    del table[key]
+                    del table[key1]
                     return table
                 else:
-                    messagebox.showerror('Error', f'No se encontró la clave de fila "{key}" en la tabla "{nombre_tabla}"')
+                    messagebox.showerror('Error', f'No se encontró la clave de fila "{key1}" en la tabla "{nombre_tabla1}"')
                     return None
-        messagebox.showerror('Error', f'No se encontró la tabla "{nombre_tabla}"')
+        messagebox.showerror('Error', f'No se encontró la tabla "{nombre_tabla1}"')
         return None
 
 
 
     # Crear dos entradas de texto para la tabla y la clave
-    tabla_entry = tk.Entry(ventana2)
+    tabla_entry1 = tk.Entry(ventana2)
     x = 300
     y = 25
-    tabla_entry.place(x=x, y=y)
-    key_entry = tk.Entry(ventana2)
+    tabla_entry1.place(x=x, y=y)
+    key_entry1 = tk.Entry(ventana2)
     x = 300
     y = 50
-    key_entry.place(x=x, y=y)
+    key_entry1.place(x=x, y=y)
 
 
     # Crear un botón que llame a la función eliminar_valor_familia cuando se hace clic en él
-    boton_eliminar = tk.Button(ventana2, text="Eliminar", command=lambda: eliminar_valor_familia())
+    boton_eliminar = tk.Button(ventana2, text="Eliminar", command=lambda: eliminar_valor_familia1())
     x = 300
     y = 75
     boton_eliminar.place(x=x, y=y)
@@ -519,7 +511,7 @@ def ventana_count():
     def count_rows(table_name, data):
         for table in data:
             if table['name'] == table_name:
-                count = len(table.get(list(table.keys())[1], {}))
+                count = len(table.keys()) - 1
                 return count
         return 0
 
@@ -679,18 +671,20 @@ def ventana_list():
         texto_salida.delete('1.0', tk.END)
 
         # Agregar encabezado a la salida
-        texto_salida.insert(tk.END, "Table\tKeys\n")
+        texto_salida.insert(tk.END, "Table\t\n")
 
         # Iterar sobre la lista de tablas y construir la salida
+        cuenta = 0
         for tabla in tables_enabled:
+            cuenta += 1
             # Obtener el nombre de la tabla y el número total de claves
             tabla_name = tabla['name']
             tabla_keys = len(tabla.keys()) - 1 # restar 1 para excluir el nombre de la tabla
             # Agregar la fila a la salida
-            texto_salida.insert(tk.END, f"{tabla_name}\t{tabla_keys}\n")
+            texto_salida.insert(tk.END, f"{tabla_name}\t\t{tabla_keys} row(s)\n")
 
         # Agregar un separador de línea
-        texto_salida.insert(tk.END, '-'*20)     
+        texto_salida.insert(tk.END, f"{cuenta} row(s)")     
 
     # Agregar un widget Text para mostrar la salida
     texto_salida = tk.Text(ventana2, height=10, width=40)
@@ -869,6 +863,7 @@ def ventana_alter():
         # Obtener el nombre de la tabla y de la familia de columnas desde las entradas de la GUI
         nombre_tabla = tabla_entry.get()
         familia_columnas = familia_entry.get()
+        key = key_entry.get()
 
         # Buscar la tabla en la lista de tablas habilitadas
         table_found = False
@@ -876,8 +871,16 @@ def ventana_alter():
             if table['name'] == nombre_tabla:
                 table_found = True
 
-                # Buscar el rowkey
-                rowkey = list(table.keys())[1]
+                # Buscar el rowkey utilizando el valor ingresado por el usuario
+                rowkey = None
+                for k in table.keys():
+                    if k == key:
+                        rowkey = k
+                        break
+
+                if rowkey is None:
+                    messagebox.showerror('Error', f'No se encontró el rowkey "{key}" en la tabla "{nombre_tabla}"')
+                    return
 
                 # Buscar la familia en el diccionario de familias del paciente
                 patient_data = table[rowkey]
@@ -889,8 +892,8 @@ def ventana_alter():
                 else:
                     messagebox.showerror('Error', f'No se encontró la familia de columnas "{familia_columnas}" en la tabla "{nombre_tabla}"')
                     return
-        if not table_found:
-            messagebox.showerror('Error', f'No se encontró la tabla "{nombre_tabla}"')
+            if not table_found:
+                messagebox.showerror('Error', f'No se encontró la tabla "{nombre_tabla}"')
 
 
 
@@ -907,19 +910,32 @@ def ventana_alter():
     y = 55
     tabla_entry.place(x=x, y=y)
 
-    familia_label = tk.Label(ventana2, text='Nombre de la familia de columnas:')
+    key_label = tk.Label(ventana2, text='Key:')
     x = 300
     y = 75
+    key_label.place(x=x, y=y)
+    key_entry = tk.Entry(ventana2)
+    x = 300
+    y = 95
+    key_entry.place(x=x, y=y)
+
+
+
+    familia_label = tk.Label(ventana2, text='Nombre de la familia de columnas:')
+    x = 300
+    y = 110
     familia_label.place(x=x, y=y)
     familia_entry = tk.Entry(ventana2)
     x = 300
-    y = 95
+    y = 130
     familia_entry.place(x=x, y=y)
+
+
 
     # Crear el botón para ejecutar la función eliminar_familia
     eliminar_button = tk.Button(ventana2, text='Eliminar', command=eliminar_familia)
     x = 300
-    y = 125
+    y = 150
     eliminar_button.place(x=x, y=y)
 
 
@@ -1078,19 +1094,22 @@ def ventana_describe():
         table_text = f"Table  {table_name_entry} is {table_type}\n"
         table_text += f"{table_name_entry}\n"
 
-        # buscar el valor que contiene la clave 'families' en el diccionario
-        for value in table_data.values():
-            if isinstance(value, dict) and 'families' in value:
-                families = value['families']
-                break
+        for key, value in table_data.items():
+            if isinstance(value, dict):
+                if 'families' in value:
+                    families = value['families']
+                    table_text += f"\nKEY => {key}\n"
+                    family_names = list(families.keys())
+                    for family_name in family_names:
+                        table_text += f"\nNAME => {family_name}\n"
+                        family_data = families[family_name]
+                        attribute_names = sorted(family_data.keys())
+                        for attribute_name in attribute_names:
+                            attribute_data = family_data[attribute_name]
+                            value = attribute_data.get('value', '')
+                            timestamp = attribute_data.get('timestamp', '')
+                            table_text += f"{attribute_name}: {value} (timestamp: {timestamp})\n"
 
-        # agregar los datos de cada familia al texto de salida
-        for family_name, family_data in families.items():
-            table_text += f"\nNAME => {family_name}\n"
-            for attribute_name, attribute_data in family_data.items():
-                value = attribute_data.get('value', '')
-                timestamp = attribute_data.get('timestamp', '')
-                table_text += f"{attribute_name}: {value} (timestamp: {timestamp})\n"
 
         return table_text
 
