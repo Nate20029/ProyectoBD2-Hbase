@@ -73,7 +73,9 @@ def ventana_datos():
         except ValueError:
             messagebox.showerror('Error', 'Por favor ingrese un número válido para la cantidad de datos a generar.')
 
+    
 
+    
 
     # Crear campo de entrada para el número de datos
     label_num_datos = tk.Label(ventana2, text='Número de Datos:')
@@ -84,7 +86,6 @@ def ventana_datos():
     # Crear botón para generar datos
     btn_generar = tk.Button(ventana2, text='Generar', command=generar)
     btn_generar.pack()
-
 
     ventana2.geometry("500x300")
     # Agregar un botón a la nueva ventana que cierre la ventana actual y muestre la ventana principal de nuevo
@@ -702,7 +703,13 @@ def ventana_list():
     boton_volver.place(x=x, y=y)
 
 
-tables_enabled = []
+tables_enabled = [
+{'name': 'hospital_919', 'Paciente_48': {'families': {'informacion_personal': {'nombre': {'value': 'Kevin Eagle', 'timestamp': 5876851578}}, 'antecedentes': {'registros': {'value': 'No', 'timestamp': 9016753843}}, 'enfermedad': {'padece': {'value': 'Infección del estómago', 'timestamp': 6953854691}}}}},
+{'name': 'hospital_482', 'Paciente_46': {'families': {'informacion_personal': {'nombre': {'value': 'María Rodríguez', 'timestamp': 4516853827}}, 'antecedentes': {'registros': {'value': 'Si', 'timestamp': 2059556470}}, 'enfermedad': {'padece': {'value': 'Infección del oído', 'timestamp': 2307221511}}}}},
+{'name': 'hospital_270', 'Paciente_85': {'families': {'informacion_personal': {'nombre': {'value': 'Kevin Eagle', 'timestamp': 7825971105}}, 'antecedentes': {'registros': {'value': 'Si', 'timestamp': 6172572177}}, 'enfermedad': {'padece': {'value': 'Gripe', 'timestamp': 2339016777}}}}},
+{'name': 'hospital_469', 'Paciente_34': {'families': {'informacion_personal': {'nombre': {'value': 'Ana Gómez', 'timestamp': 1356783063}}, 'antecedentes': {'registros': {'value': 'No', 'timestamp': 2872586736}}, 'enfermedad': {'padece': {'value': 'Infección del estómago', 'timestamp': 1679274398}}}}},
+{'name': 'hospital_626', 'Paciente_95': {'families': {'informacion_personal': {'nombre': {'value': 'Pedro Pérez', 'timestamp': 9627274533}}, 'antecedentes': {'registros': {'value': 'Si', 'timestamp': 2428783340}}, 'enfermedad': {'padece': {'value': 'Gripe', 'timestamp': 3506545646}}}}}
+]
 tables_disabled = []
 
 # Función para crear la nueva ventana
