@@ -1,11 +1,16 @@
-import csv
+# Nombre del archivo CSV
+nombre_archivo = 'datos_hospital.csv'
 
-data = []
+# Variable para almacenar los datos del archivo CSV
+datos_csv = ''
 
-with open('datos_hospital.csv') as csvfile:
-    reader = csv.reader(csvfile)
-    for row in reader:
-        data.append(row)
+# Abrir el archivo CSV en modo lectura
+with open(nombre_archivo, 'r') as archivo:
+    # Leer todo el contenido del archivo CSV y almacenarlo en la variable datos_csv
+    datos_csv = archivo.read()
 
-print(data)
+# Imprimir los datos leídos del archivo CSV
+print(datos_csv)
+
+
 
